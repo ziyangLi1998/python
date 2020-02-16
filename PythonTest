@@ -1,0 +1,53 @@
+# 导入需要的库
+import urllib.request
+import urllib.parse
+import json
+import time
+while True:
+    
+    # 等待用户输入需要翻译的单词
+    content = input('请输入需要翻译的单词(输入“q!”退出程序)：')
+    if content =='q!':
+        break
+
+    # 有道翻译的url链接
+    url = 'http://fanyi.youdao.com/translate?smartresult=dict&smartresult=rule&sessionFrom=null'
+
+    header = {}
+    header['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:72.0) Gecko/20100101 Firefox/72.0'
+
+    # 发送给有道服务器的数据
+    data = {}
+     
+    # 需要翻译的文字
+    data['i'] = content
+    # 下面这些都先按照我们之前抓包获取到的数据
+    data['from'] = 'AUTO'
+    data['to'] = 'AUTO'
+    data['smartresult'] = 'dict'
+    data['client'] = 'fanyideskweb'
+    data['salt'] = '1500349255670'
+    data['sign'] = '997742c66698b25b43a3a5030e1c2ff2'
+    data['doctype'] = 'json'
+    data['version'] = '2.1'
+    data['keyfrom'] = 'fanyi.web'
+    data['action'] = 'FY_BY_CL1CKBUTTON'
+    data['typoResult'] = 'true'
+     
+    # 对数据进行编码处理
+    data = urllib.parse.urlencode(data).encode('utf-8')
+     
+    # 创建一个Request对象，把url和data传进去，并且需要注意的使用的是POST请求
+    request = urllib.request.Request(url=url, data=data, method='POST')
+    # 打开这个请求
+    response = urllib.request.urlopen(request)
+    # 读取返回来的数据
+    result_str = response.read().decode('utf-8')
+    # 把返回来的json字符串解析成字典
+    result_dict = json.loads(result_str)
+     
+    # 获取翻译结果
+    result_dict = result_dict['translateResult'][0][0]['tgt']
+
+    print ('翻译的结果是：%s'%result_dict)
+    time.sleep(3)
